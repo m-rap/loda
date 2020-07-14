@@ -19,8 +19,6 @@ add_library( # Sets the name of the library.
              # Provides a relative path to your source file(s).
              native-lib.cpp )
 
-add_library(sampletoload SHARED sampletoload.cpp)
-
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
 # default, you only need to specify the name of the public NDK library
@@ -44,3 +42,22 @@ target_link_libraries( # Specifies the target library.
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib} )
+
+
+add_library(sampletoload SHARED sampletoload.cpp)
+
+
+add_library(loda1 SHARED
+    loda1.cpp
+    ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
+)
+target_include_directories(loda1 PUBLIC ${ANDROID_NDK}/sources/android/native_app_glue)
+target_link_libraries(loda1 android ${log-lib})
+
+
+add_library(loda2 SHARED
+    loda2.cpp
+    ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
+)
+target_include_directories(loda2 PUBLIC ${ANDROID_NDK}/sources/android/native_app_glue)
+target_link_libraries(loda2 android ${log-lib})
