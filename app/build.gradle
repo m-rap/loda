@@ -17,13 +17,25 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     externalNativeBuild {
         cmake {
             path "src/main/cpp/CMakeLists.txt"
+        }
+    }
+
+    splits {
+        abi {
+            enable true
+
+            // By default all ABIs are included, so use reset() and include abi we want
+            reset()
+
+            include "x86", "x86_64", "armeabi-v7a", "arm64-v8a"
+            universalApk false
         }
     }
 }
