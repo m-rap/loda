@@ -20,11 +20,11 @@ void android_main(struct android_app* state) {
             if (source != nullptr) {
                 source->process(state, source);
             }
-        }
 
-        if (state->destroyRequested) {
-            LOGI("destroying loda activity");
-            return;
+            if (state->destroyRequested) {
+                LOGI("destroying loda activity");
+                return;
+            }
         }
     }
 }

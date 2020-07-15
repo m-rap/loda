@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(that, LodaActivity1.class);
+                intent.putExtra("libpath", "libsampletoload.so");
                 startActivity(intent);
             }
         });

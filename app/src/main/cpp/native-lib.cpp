@@ -1,6 +1,9 @@
 #include <jni.h>
 #include <string>
 #include <dlfcn.h>
+#include <android/log.h>
+
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
 
 jmethodID getPrintStreamMetId(JNIEnv* env, jobject printStream) {
     jclass clz = env->GetObjectClass(printStream);
@@ -28,24 +31,30 @@ Java_com_mrap_loda_Loda_loadLib(
 
     jmethodID metId = getPrintStreamMetId(env, printStream);
 
-    jniprintf(env, printStream, metId, "inside loadLib\n");
+    //jniprintf(env, printStream, metId, "inside loadLib\n");
+    LOGI("inside loadLib\n");
     const char* libPath = env->GetStringUTFChars(jLibPath, (jboolean*)0);
     void* handle = dlopen(libPath, RTLD_LAZY);
     if (!handle) {
-        jniprintf(env, printStream, metId, "dlopen error\n");
+        //jniprintf(env, printStream, metId, "dlopen error\n");
+        LOGI("dlopen error\n");
         return env->NewStringUTF(dlerror());
     }
-    jniprintf(env, printStream, metId, "dlopen success\n");
+    //jniprintf(env, printStream, metId, "dlopen success\n");
+    LOGI("dlopen success\n");
     void (*execute)();
     execute = (void (*)())dlsym(handle, "execute");
     char* error = dlerror();
     if (error != NULL) {
+        LOGI("dlsym error\n");
         return env->NewStringUTF(error);
     }
-    jniprintf(env, printStream, metId, "dlsym success\n");
+    //jniprintf(env, printStream, metId, "dlsym success\n");
+    LOGI("dlsym success\n");
     execute();
     dlclose(handle);
     env->ReleaseStringUTFChars(jLibPath, libPath);
-    jniprintf(env, printStream, metId, "handle closed\n");
+    //jniprintf(env, printStream, metId, "handle closed\n");
+    LOGI("handle closed\n");
     return env->NewStringUTF("success");
 }
