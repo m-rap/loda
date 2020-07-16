@@ -11,11 +11,11 @@
 class HelloPrinter {
 public:
     void print() {
-        printf("Hello from HelloPrinter\n");
+        LOGI("Hello from HelloPrinter\n");
     }
 };
 
-extern "C" void execute() {
+extern "C" void helloPrinter() {
     HelloPrinter helloPrinter;
     helloPrinter.print();
 }

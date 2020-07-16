@@ -1,9 +1,11 @@
 package com.mrap.loda;
 
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
+//import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class MainActivity2 extends AppCompatActivity {
+//public class MainActivity2 extends AppCompatActivity {
+public class MainActivity2 extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

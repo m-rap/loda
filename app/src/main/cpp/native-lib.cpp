@@ -42,8 +42,8 @@ Java_com_mrap_loda_Loda_loadLib(
     }
     //jniprintf(env, printStream, metId, "dlopen success\n");
     LOGI("dlopen success\n");
-    void (*execute)();
-    execute = (void (*)())dlsym(handle, "execute");
+    void (*helloPrinter)();
+    helloPrinter = (void (*)())dlsym(handle, "execute");
     char* error = dlerror();
     if (error != NULL) {
         LOGI("dlsym error\n");
@@ -51,7 +51,7 @@ Java_com_mrap_loda_Loda_loadLib(
     }
     //jniprintf(env, printStream, metId, "dlsym success\n");
     LOGI("dlsym success\n");
-    execute();
+    helloPrinter();
     dlclose(handle);
     env->ReleaseStringUTFChars(jLibPath, libPath);
     //jniprintf(env, printStream, metId, "handle closed\n");

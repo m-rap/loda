@@ -44,11 +44,6 @@ target_link_libraries( # Specifies the target library.
                        ${log-lib} )
 
 
-add_library(sampletoload SHARED sampletoload.cpp)
-target_include_directories(sampletoload PUBLIC ${ANDROID_NDK}/sources/android/native_app_glue)
-target_link_libraries(sampletoload android ${log-lib})
-
-
 add_library(loda1 SHARED
     loda1.cpp
     ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
@@ -63,3 +58,5 @@ add_library(loda2 SHARED
 )
 target_include_directories(loda2 PUBLIC ${ANDROID_NDK}/sources/android/native_app_glue)
 target_link_libraries(loda2 android ${log-lib})
+
+add_subdirectory("sampletoload")
