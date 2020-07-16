@@ -60,3 +60,4 @@ target_include_directories(loda2 PUBLIC ${ANDROID_NDK}/sources/android/native_ap
 target_link_libraries(loda2 android ${log-lib})
 
 add_subdirectory("sampletoload")
+add_subdirectory("ndk-samples/native-activity")

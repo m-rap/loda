@@ -17,6 +17,7 @@ public class MainActivity extends Activity {
     Button btnLoda1;
     Button btnLoda2;
     Button btnMa2;
+    Button btnHelloGl2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +64,16 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(that, MainActivity2.class);
+                startActivity(intent);
+            }
+        });
+
+        btnHelloGl2 = findViewById(R.id.btnHelloGl2);
+        btnHelloGl2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(that, LodaActivity1.class);
+                intent.putExtra("libpath", "libnative-activity.so");
                 startActivity(intent);
             }
         });
