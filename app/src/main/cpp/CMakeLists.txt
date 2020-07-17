@@ -49,7 +49,7 @@ add_library(loda1 SHARED
     ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
 )
 target_include_directories(loda1 PUBLIC ${ANDROID_NDK}/sources/android/native_app_glue)
-target_link_libraries(loda1 android ${log-lib})
+target_link_libraries(loda1 android ${log-lib} dl)
 
 
 add_library(loda2 SHARED
@@ -61,3 +61,4 @@ target_link_libraries(loda2 android ${log-lib})
 
 add_subdirectory("sampletoload")
 add_subdirectory("ndk-samples/native-activity")
+add_subdirectory("triangle")

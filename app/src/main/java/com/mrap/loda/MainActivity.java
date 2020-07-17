@@ -17,7 +17,8 @@ public class MainActivity extends Activity {
     Button btnLoda1;
     Button btnLoda2;
     Button btnMa2;
-    Button btnHelloGl2;
+    Button btnNatAct;
+    Button btnTriangle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,12 +69,22 @@ public class MainActivity extends Activity {
             }
         });
 
-        btnHelloGl2 = findViewById(R.id.btnHelloGl2);
-        btnHelloGl2.setOnClickListener(new View.OnClickListener() {
+        btnNatAct = findViewById(R.id.btnNatAct);
+        btnNatAct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(that, LodaActivity1.class);
                 intent.putExtra("libpath", "libnative-activity.so");
+                startActivity(intent);
+            }
+        });
+
+        btnTriangle = findViewById(R.id.btnTriangle);
+        btnTriangle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(that, LodaActivity1.class);
+                intent.putExtra("libpath", "libtriangle.so");
                 startActivity(intent);
             }
         });
