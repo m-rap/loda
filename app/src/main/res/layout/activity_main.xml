@@ -18,6 +18,15 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!--
+    <Button
+        android:id="@+id/btnTriangle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="triangle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnNatAct" />
+
     <TextView
         android:id="@+id/sample_text"
         android:layout_width="wrap_content"
@@ -38,15 +47,6 @@
         app:layout_constraintTop_toBottomOf="@+id/sample_text" />
 
     <Button
-        android:id="@+id/btnLoda1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Loda 1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnLoad" />
-
-    <Button
         android:id="@+id/btnLoda2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -63,24 +63,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnLoda2" />
-
-    <Button
-        android:id="@+id/btnNatAct"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="native-activity"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnLoda2" />
-
-    <Button
-        android:id="@+id/btnTriangle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="triangle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnNatAct" />
     -->
 
 </android.support.constraint.ConstraintLayout>

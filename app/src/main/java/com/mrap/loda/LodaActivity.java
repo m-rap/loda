@@ -3,7 +3,7 @@ package com.mrap.loda;
 import android.app.NativeActivity;
 import android.os.Bundle;
 
-public class LodaActivity1 extends NativeActivity {
+public class LodaActivity extends NativeActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

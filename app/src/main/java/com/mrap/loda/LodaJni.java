@@ -2,11 +2,11 @@ package com.mrap.loda;
 
 import java.io.PrintStream;
 
-public class Loda {
+public class LodaJni {
 
     String _libPath;
 
-    public Loda(String libPath) {
+    public LodaJni(String libPath) {
         _libPath = libPath;
     }
 
