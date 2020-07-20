@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <id name="btnTriangle"></id>
+    <id name="sample_text"></id>
+    <id name="btnLoad"></id>
+    <id name="btnLoda1"></id>
+    <id name="btnLoda2"></id>
+    <id name="btnMa2"></id>
+    <id name="btnNatAct"></id>
+</resources>
