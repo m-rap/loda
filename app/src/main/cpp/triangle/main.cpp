@@ -344,7 +344,7 @@ ASensorManager* AcquireASensorManagerInstance(android_app* app) {
  * android_native_app_glue.  It runs in its own thread, with its own
  * event loop for receiving input events and doing other things.
  */
-extern "C" void android_main(struct android_app* state) {
+void android_main(struct android_app* state) {
     struct engine engine{};
 
     memset(&engine, 0, sizeof(engine));
@@ -413,7 +413,7 @@ extern "C" void android_main(struct android_app* state) {
             }
 
             if (secDiff != prevSecDiff) {
-                LOGI("current destroyRequested %d", state->destroyRequested);
+                //LOGI("current destroyRequested %d", state->destroyRequested);
             }
 
             // Check if we are exiting.
