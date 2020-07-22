@@ -41,11 +41,18 @@ public class MainActivity extends Activity {
         btnLoad = findViewById(R.id.btnLoad);
         if (btnLoad != null) {
             btnLoad.setOnClickListener(new View.OnClickListener() {
+                //@Override
+                //public void onClick(View v) {
+                //    LodaJni l = new LodaJni("libsampletoload.so");
+                //    String res = l.runLoadLib();
+                //    tv.setText(res);
+                //}
+
                 @Override
                 public void onClick(View v) {
-                    LodaJni l = new LodaJni("libsampletoload.so");
-                    String res = l.runLoadLib();
-                    tv.setText(res);
+                    Intent intent = new Intent(that, LodaActivity.class);
+                    intent.putExtra("libpath", "/sdcard/loda/libtriangle.so");
+                    startActivity(intent);
                 }
             });
         }

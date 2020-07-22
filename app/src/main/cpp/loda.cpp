@@ -9,13 +9,14 @@
 #include <cxxabi.h>
 #include <link.h>
 #include <stdio.h>
-#include <vector>
 #include <errno.h>
 #include <elf.h>
+#include <ctype.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <vector>
 
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
-
-#define USE_DEMANGLING 1
 
 using namespace std;
 
@@ -99,24 +100,125 @@ static int callback(struct dl_phdr_info *info, size_t size, void *data) {
     return 0;
 }
 
-bool getLibFunc(const char* path, struct android_app* state) {
-    void* handle = dlopen(path, RTLD_LAZY | RTLD_GLOBAL);
+void trimStr(char* str) {
+    if (str[0] == '\0')
+        return;
+
+    char sz[4096];
+    char* temp = sz;
+    strcpy(temp, str);
+
+    while (isspace(*temp))
+        temp++;
+
+    char* temp2 = temp + strlen(temp);
+
+    if (temp2 != temp)
+    {
+        while (isspace(*--temp2));
+        *(temp2 + 1)='\0';
+    }
+    strcpy(str, temp);
+}
+
+int splitString(const char* input, const char* delimiter, vector< vector<char> >& output) {
+    char tmpStr[512];
+    strcpy(tmpStr, input);
+    trimStr(tmpStr);
+
+    char* tmpStr2 = &tmpStr[0];
+    char* token = strsep(&tmpStr2, delimiter);
+
+    while (token != NULL) {
+        vector<char> el;
+        el.resize(strlen(token) + 1);
+        strcpy(&el[0], token);
+        output.push_back(el);
+        token = strsep(&tmpStr2, delimiter);
+    }
+    return output.size();
+}
+
+char filename[128] = "";
+char targetFilename[128] = "libtarget.so";
+char sourcePath[128] = "";
+char targetPath[128] = "/data/data/com.mrap.loda/libtarget.so";
+bool islocal = false;
+
+void copyToInternal() {
+    int res = mkdir("/data/data/com.mrap.loda", 0755);
+    if (res != 0) {
+        LOGI("mkdir failed %s", strerror(errno));
+    }
+
+    FILE* ftarget = fopen(targetPath, "wb");
+    if (ftarget == NULL) {
+        LOGI("cant open %s: %s", targetPath, strerror(errno));
+        return;
+    }
+    FILE* f = fopen(sourcePath, "rb");
+    if (f == NULL) {
+        LOGI("cant open %s: %s", sourcePath, strerror(errno));
+        fclose(ftarget);
+        return;
+    }
+
+    int totalCopied = 0;
+    while (true) {
+        unsigned char buff[512];
+        int len = fread(buff, 1, 512, f);
+        if (len == 0) {
+            break;
+        }
+        fwrite(buff, 1, len, ftarget);
+        totalCopied += len;
+    }
+
+    LOGI("copied %d", totalCopied);
+
+    fclose(f);
+    fclose(ftarget);
+}
+
+bool getLibFunc(struct android_app* state) {
+    vector<vector<char>> pathEls;
+    int n = splitString(sourcePath, "/", pathEls);
+    if (n > 0) {
+        if (strlen(&pathEls[n - 1][0]) > 0) {
+            strcpy(filename, &pathEls[n - 1][0]);
+        } else if (n > 1) {
+            strcpy(filename, &pathEls[n - 2][0]);
+        }
+    }
+
+    if (strcmp(sourcePath, filename) == 0) {
+        islocal = true;
+        strcpy(targetFilename, sourcePath);
+        strcpy(targetPath, sourcePath);
+    }
+
+    LOGI("%d sourcePath: %s, filename: %s", n, sourcePath, filename);
+
+    if (!islocal) {
+        copyToInternal();
+    }
+
+    void* handle = dlopen(targetPath, RTLD_LAZY | RTLD_GLOBAL);
     if (!handle) {
-        LOGI("dlopen error");
+        LOGI("dlopen error %s", dlerror());
         return false;
     }
     LOGI("dlopen success");
 
-    dl_iterate_phdr(callback, (void*)path);
-
-    handle = dlopen(path, RTLD_LAZY | RTLD_GLOBAL);
+    //dl_iterate_phdr(callback, (void*)filename);
+    dl_iterate_phdr(callback, (void*)targetFilename);
 
     void (*libMainFunc)(struct android_app*);
 
     libMainFunc = (void (*)(struct android_app*))dlsym(handle, finalTargetFuncName);
     char* error = dlerror();
     if (error != NULL) {
-        LOGI("dlsym error");
+        LOGI("dlsym error %s", error);
         dlclose(handle);
         return false;
     }
@@ -126,7 +228,27 @@ bool getLibFunc(const char* path, struct android_app* state) {
     LOGI("loda closing handle");
     dlclose(handle);
 
-    return  true;
+    return true;
+}
+
+void waitTermination(struct android_app* state) {
+    while (true) {
+        int ident;
+        int events;
+        struct android_poll_source *source;
+
+        while ((ident = ALooper_pollAll(0, nullptr, &events,
+                                        (void **) &source)) >= 0) {
+            // Process this event.
+            if (source != nullptr) {
+                source->process(state, source);
+            }
+            if (state->destroyRequested)
+                break;
+        }
+        if (state->destroyRequested)
+            break;
+    }
 }
 
 void android_main(struct android_app* state) {
@@ -142,14 +264,13 @@ void android_main(struct android_app* state) {
     jstring jpath = (jstring)env->CallObjectMethod(activityObj, methodId, jpathKey);
     env->DeleteLocalRef(jpathKey);
     const char* path = env->GetStringUTFChars(jpath, 0);
-    char pathCopy[100];
-    strcpy(pathCopy, path);
+    strcpy(sourcePath, path);
     env->ReleaseStringUTFChars(jpath, path);
 
-    bool res = getLibFunc(path, state);
+    bool res = getLibFunc(state);
 
     if (!res) {
-        while (state->destroyRequested == 0);
+        waitTermination(state);
     }
 
     LOGI("loda exiting android_main");
