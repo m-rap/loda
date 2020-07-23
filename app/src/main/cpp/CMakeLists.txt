@@ -5,51 +5,58 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
+#set(ANDROID_ALLOW_UNDEFINED_SYMBOLS TRUE)
+#set(CMAKE_SHARED_LINKER_FLAGS "")
+#message("ANDROID_ALLOW_UNDEFINED_SYMBOLS ${ANDROID_ALLOW_UNDEFINED_SYMBOLS}")
+#message("CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS}")
+#message("ANDROID_LINKER_FLAGS ${ANDROID_LINKER_FLAGS}")
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
-add_library( # Sets the name of the library.
-             native-lib
+#add_library( # Sets the name of the library.
+#             native-lib
+#
+#             # Sets the library as a shared library.
+#             SHARED
+#
+#             # Provides a relative path to your source file(s).
+#             native-lib.cpp )
+#
+## Searches for a specified prebuilt library and stores the path as a
+## variable. Because CMake includes system libraries in the search path by
+## default, you only need to specify the name of the public NDK library
+## you want to add. CMake verifies that the library exists before
+## completing its build.
+#
+#find_library( # Sets the name of the path variable.
+#              log-lib
+#
+#              # Specifies the name of the NDK library that
+#              # you want CMake to locate.
+#              log )
+#
+## Specifies libraries CMake should link to your target library. You
+## can link multiple libraries, such as libraries you define in this
+## build script, prebuilt third-party libraries, or system libraries.
+#
+#target_link_libraries( # Specifies the target library.
+#                       native-lib
+#
+#                       # Links the target library to the log library
+#                       # included in the NDK.
+#                       ${log-lib} )
 
-             # Sets the library as a shared library.
-             SHARED
-
-             # Provides a relative path to your source file(s).
-             native-lib.cpp )
-
-# Searches for a specified prebuilt library and stores the path as a
-# variable. Because CMake includes system libraries in the search path by
-# default, you only need to specify the name of the public NDK library
-# you want to add. CMake verifies that the library exists before
-# completing its build.
-
-find_library( # Sets the name of the path variable.
-              log-lib
-
-              # Specifies the name of the NDK library that
-              # you want CMake to locate.
-              log )
-
-# Specifies libraries CMake should link to your target library. You
-# can link multiple libraries, such as libraries you define in this
-# build script, prebuilt third-party libraries, or system libraries.
-
-target_link_libraries( # Specifies the target library.
-                       native-lib
-
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ${log-lib} )
-
+#default flag: -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libgcc_real.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments
+#set(CMAKE_SHARED_LINKER_FLAGS "")
 
 add_library(loda SHARED
     loda.cpp
     ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
 )
 target_include_directories(loda PUBLIC ${ANDROID_NDK}/sources/android/native_app_glue)
-target_link_libraries(loda android ${log-lib} dl)
+target_link_libraries(loda android log dl)
 
-
-add_subdirectory("triangle")
+#add_subdirectory("triangle")

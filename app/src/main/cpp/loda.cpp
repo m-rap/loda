@@ -145,6 +145,15 @@ char sourcePath[128] = "";
 char targetPath[128] = "/data/data/com.mrap.loda/libtarget.so";
 bool islocal = false;
 
+void reset() {
+    LOGI("reset vars");
+    strcpy(filename, "");
+    strcpy(targetFilename, "libtarget.so");
+    strcpy(sourcePath, "");
+    strcpy(targetPath, "/data/data/com.mrap.loda/libtarget.so");
+    islocal = false;
+}
+
 void copyToInternal() {
     int res = mkdir("/data/data/com.mrap.loda", 0755);
     if (res != 0) {
@@ -197,18 +206,21 @@ bool getLibFunc(struct android_app* state) {
         strcpy(targetPath, sourcePath);
     }
 
-    LOGI("%d sourcePath: %s, filename: %s", n, sourcePath, filename);
+    LOGI("%d %d sourcePath: %s, filename: %s", n, islocal, sourcePath, filename);
 
     if (!islocal) {
         copyToInternal();
     }
 
-    void* handle = dlopen(targetPath, RTLD_LAZY | RTLD_GLOBAL);
+    //void* handle = dlopen(targetPath, RTLD_LAZY | RTLD_GLOBAL);
+    void* handle = dlopen(targetPath, RTLD_LAZY); // RTLD_GLOBAL bikin sigsegv kalo diload kedua kali
     if (!handle) {
         LOGI("dlopen error %s", dlerror());
         return false;
     }
     LOGI("dlopen success");
+
+    dlerror(); /* Clear any existing error */
 
     //dl_iterate_phdr(callback, (void*)filename);
     dl_iterate_phdr(callback, (void*)targetFilename);
@@ -253,6 +265,8 @@ void waitTermination(struct android_app* state) {
 
 void android_main(struct android_app* state) {
     LOGI("loda inside android_main");
+
+    reset();
 
     JNIEnv* env = state->activity->env;
     state->activity->vm->AttachCurrentThread(&env, 0);

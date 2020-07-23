@@ -1,5 +1,5 @@
 #include <jni.h>
-#include <string>
+#include <stdio.h>
 #include <dlfcn.h>
 #include <android/log.h>
 
@@ -24,12 +24,10 @@ void jniprintf(JNIEnv* env, jobject printStream, jmethodID metId, const char* fm
     env->DeleteLocalRef(stringFromC);
 }
 
-extern "C" JNIEXPORT jstring JNICALL
-Java_com_mrap_loda_Loda_loadLib(
-        JNIEnv* env,
-        jobject /* this */, jstring jLibPath, jobject printStream) {
-
-    jmethodID metId = getPrintStreamMetId(env, printStream);
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_mrap_loda_LodaJni_loadLib(JNIEnv *env, jobject thiz, jstring jLibPath) {
+    //jmethodID metId = getPrintStreamMetId(env, printStream);
 
     //jniprintf(env, printStream, metId, "inside loadLib\n");
     LOGI("inside loadLib\n");

@@ -54,6 +54,7 @@ struct engine {
     ASensorEventQueue* sensorEventQueue;
 
     int animating;
+    bool terminating;
     EGLDisplay display;
     EGLSurface surface;
     EGLContext context;
@@ -207,20 +208,24 @@ static void engine_draw_frame(struct engine* engine) {
  * Tear down the EGL context currently associated with the display.
  */
 static void engine_term_display(struct engine* engine) {
-    if (engine->display != EGL_NO_DISPLAY) {
-        LOGI("make current nothing");
-        eglMakeCurrent(engine->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-        if (engine->context != EGL_NO_CONTEXT) {
-            LOGI("destroying context");
-            eglDestroyContext(engine->display, engine->context);
-        }
-        if (engine->surface != EGL_NO_SURFACE) {
-            LOGI("destroying surface");
-            eglDestroySurface(engine->display, engine->surface);
-        }
-        LOGI("terminating display");
-        eglTerminate(engine->display);
+    LOGI("inside term display");
+    if (engine->terminating) {
+        return;
     }
+    engine->terminating = true;
+    LOGI("make current nothing");
+    eglMakeCurrent(engine->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+    if (engine->context != EGL_NO_CONTEXT) {
+        LOGI("destroying context");
+        eglDestroyContext(engine->display, engine->context);
+    }
+    if (engine->surface != EGL_NO_SURFACE) {
+        LOGI("destroying surface");
+        eglDestroySurface(engine->display, engine->surface);
+    }
+    LOGI("terminating display");
+    eglTerminate(engine->display);
+
     engine->animating = 0;
     engine->display = EGL_NO_DISPLAY;
     engine->context = EGL_NO_CONTEXT;
@@ -345,12 +350,15 @@ ASensorManager* AcquireASensorManagerInstance(android_app* app) {
  * event loop for receiving input events and doing other things.
  */
 void android_main(struct android_app* state) {
+    LOGI("inside libtriangle.so");
     struct engine engine{};
 
     memset(&engine, 0, sizeof(engine));
     state->userData = &engine;
     state->onAppCmd = engine_handle_cmd;
     state->onInputEvent = engine_handle_input;
+
+    engine.terminating = false;
     engine.app = state;
 
     // Prepare to monitor accelerometer
@@ -375,6 +383,8 @@ void android_main(struct android_app* state) {
 
     int secDiff = 0;
     int prevSecDiff = 0;
+
+    LOGI("entering loop");
 
     while (true) {
         // Read all pending events.
@@ -419,7 +429,7 @@ void android_main(struct android_app* state) {
             // Check if we are exiting.
             if (state->destroyRequested != 0) {
                 LOGI("destroying from destroyRequested");
-                //engine_term_display(&engine);
+                engine_term_display(&engine);
                 return;
             }
         }

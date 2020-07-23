@@ -31,9 +31,9 @@ public class MainActivity extends Activity {
             btnTriangle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(that, LodaActivity.class);
-                    intent.putExtra("libpath", "libtriangle.so");
-                    startActivity(intent);
+                    //Intent intent = new Intent(that, LodaActivity.class);
+                    //intent.putExtra("libpath", "libtriangle.so");
+                    //startActivity(intent);
                 }
             });
         }

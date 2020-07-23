@@ -18,8 +18,13 @@ cmake_minimum_required(VERSION 3.4.1)
 
 # Export ANativeActivity_onCreate(),
 # Refer to: https://github.com/android-ndk/ndk/issues/381.
-set(CMAKE_SHARED_LINKER_FLAGS
-        "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
+#set(CMAKE_SHARED_LINKER_FLAGS
+#        "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
+
+#set(ANDROID_ALLOW_UNDEFINED_SYMBOLS false)
+
+#set(CMAKE_SHARED_LINKER_FLAGS
+#        "${CMAKE_SHARED_LINKER_FLAGS} -fPIC")
 
 add_library(triangle
         SHARED
