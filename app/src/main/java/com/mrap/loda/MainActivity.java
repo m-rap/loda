@@ -5,6 +5,7 @@ import android.app.NativeActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -15,11 +16,17 @@ public class MainActivity extends Activity {
     Button btnLoad;
     Button btnLoda2;
     Button btnMa2;
+    public ViewGroup root;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //getActionBar().hide();
+
         setContentView(R.layout.activity_main);
+
+        root = findViewById(R.id.mainRoot);
 
         // Example of a call to a native method
         tv = findViewById(R.id.sample_text);
@@ -78,5 +85,7 @@ public class MainActivity extends Activity {
                 }
             });
         }
+
+        //FileChooser f = new FileChooser(this, root);
     }
 }

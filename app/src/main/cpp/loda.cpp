@@ -5,16 +5,16 @@
 #include <android_native_app_glue.h>
 #include <android/log.h>
 #include <dlfcn.h>
-#include <string.h>
-#include <cxxabi.h>
-#include <link.h>
-#include <stdio.h>
 #include <errno.h>
-#include <elf.h>
 #include <ctype.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <vector>
+//#include <string.h>
+//#include <cxxabi.h>
+//#include <link.h>
+//#include <stdio.h>
+//#include <elf.h>
+//#include <sys/types.h>
 
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
 
@@ -23,82 +23,82 @@ using namespace std;
 const char* targetFuncName = "android_main";
 char finalTargetFuncName[128];
 
-static int callback(struct dl_phdr_info *info, size_t size, void *data) {
-    const char * libname = (const char *)data;
-    if (!strstr(info->dlpi_name, libname)) {
-        return 0;
-    }
-
-    LOGI(":::: %s, phnum %d", info->dlpi_name, info->dlpi_phnum);
-
-    for (int i = 0; i < info->dlpi_phnum; i++) {
-        //LOGI("%d p_type %d %d", i, info->dlpi_phdr[i].p_type, PT_DYNAMIC);
-        // we need to save dynamic section since it contains symbolic table
-        if (info->dlpi_phdr[i].p_type != PT_DYNAMIC) {
-            continue;
-        }
-
-        ElfW(Sym*) symtab = nullptr;
-        char* strtab = nullptr;
-        int symentries = 0;
-        int sym_cnt = 0;
-        ElfW(Word*) hash;
-
-        ElfW(Dyn*) dyn = (ElfW(Dyn*))(info->dlpi_addr + info->dlpi_phdr[i].p_vaddr);
-        int dynLen = info->dlpi_phdr[i].p_memsz / sizeof(ElfW(Dyn));
-        //LOGI("p_memsz %d dynLen %d sizeof dyn %d", info->dlpi_phdr[i].p_memsz, dynLen, sizeof(ElfW(Dyn)));
-        LOGI("dlpi_addr %08x p_vaddr %08x dyn %08x", info->dlpi_addr, info->dlpi_phdr[i].p_vaddr, dyn);
-
-        for (; dyn->d_tag != DT_NULL; dyn++) {
-            //LOGI("d_tag %d. %d %d %d %d", dyn->d_tag, DT_SYMTAB, DT_STRTAB, DT_SYMENT, DT_HASH);
-            if (dyn->d_tag == DT_SYMTAB) {
-                //symtab = (ElfW(Sym*))dyn->d_un.d_ptr;
-                symtab = (ElfW(Sym*))(info->dlpi_addr + dyn->d_un.d_ptr);
-            }
-            if (dyn->d_tag == DT_STRTAB) {
-                //strtab = (char*)dyn->d_un.d_ptr;
-                strtab = (char*)(info->dlpi_addr + dyn->d_un.d_ptr);
-            }
-            if (dyn->d_tag == DT_SYMENT) {
-                symentries = dyn->d_un.d_val;
-            }
-        }
-
-        int size2 = strtab - (char *)symtab;
-        int tabLen = size2 / symentries;
-        LOGI("phdr %d symtab %08x strtab %08x symentries %d size %d tabLen %d", i, symtab, strtab, symentries, size2, tabLen);
-
-        // for each string in table
-        for (int j = 0; j < tabLen; j++) {
-            ElfW(Sym) sym = symtab[j];
-            char* str = &strtab[sym.st_name];
-            size_t demangledSize = 512;
-            int status;
-            char demangled[512];
-            abi::__cxa_demangle(str, demangled, &demangledSize, &status);
-
-            bool found = false;
-            if (status == 0) {
-                if (strstr(demangled, targetFuncName)) {
-                    found = true;
-                    strcpy(finalTargetFuncName, str);
-                }
-            } else {
-                if (strstr(str, targetFuncName)) {
-                    found = true;
-                    strcpy(finalTargetFuncName, targetFuncName);
-                }
-            }
-
-            if (found) {
-                LOGI("sym %d %08x %s, %s", j, &symtab[j], str,
-                        status == 0 ? demangled : "(can't demangle)");
-            }
-        }
-        break;
-    }
-    return 0;
-}
+//static int callback(struct dl_phdr_info *info, size_t size, void *data) {
+//    const char * libname = (const char *)data;
+//    if (!strstr(info->dlpi_name, libname)) {
+//        return 0;
+//    }
+//
+//    LOGI(":::: %s, phnum %d", info->dlpi_name, info->dlpi_phnum);
+//
+//    for (int i = 0; i < info->dlpi_phnum; i++) {
+//        //LOGI("%d p_type %d %d", i, info->dlpi_phdr[i].p_type, PT_DYNAMIC);
+//        // we need to save dynamic section since it contains symbolic table
+//        if (info->dlpi_phdr[i].p_type != PT_DYNAMIC) {
+//            continue;
+//        }
+//
+//        ElfW(Sym*) symtab = nullptr;
+//        char* strtab = nullptr;
+//        int symentries = 0;
+//        int sym_cnt = 0;
+//        ElfW(Word*) hash;
+//
+//        ElfW(Dyn*) dyn = (ElfW(Dyn*))(info->dlpi_addr + info->dlpi_phdr[i].p_vaddr);
+//        int dynLen = info->dlpi_phdr[i].p_memsz / sizeof(ElfW(Dyn));
+//        //LOGI("p_memsz %d dynLen %d sizeof dyn %d", info->dlpi_phdr[i].p_memsz, dynLen, sizeof(ElfW(Dyn)));
+//        LOGI("dlpi_addr %08x p_vaddr %08x dyn %08x", info->dlpi_addr, info->dlpi_phdr[i].p_vaddr, dyn);
+//
+//        for (; dyn->d_tag != DT_NULL; dyn++) {
+//            //LOGI("d_tag %d. %d %d %d %d", dyn->d_tag, DT_SYMTAB, DT_STRTAB, DT_SYMENT, DT_HASH);
+//            if (dyn->d_tag == DT_SYMTAB) {
+//                //symtab = (ElfW(Sym*))dyn->d_un.d_ptr;
+//                symtab = (ElfW(Sym*))(info->dlpi_addr + dyn->d_un.d_ptr);
+//            }
+//            if (dyn->d_tag == DT_STRTAB) {
+//                //strtab = (char*)dyn->d_un.d_ptr;
+//                strtab = (char*)(info->dlpi_addr + dyn->d_un.d_ptr);
+//            }
+//            if (dyn->d_tag == DT_SYMENT) {
+//                symentries = dyn->d_un.d_val;
+//            }
+//        }
+//
+//        int size2 = strtab - (char *)symtab;
+//        int tabLen = size2 / symentries;
+//        LOGI("phdr %d symtab %08x strtab %08x symentries %d size %d tabLen %d", i, symtab, strtab, symentries, size2, tabLen);
+//
+//        // for each string in table
+//        for (int j = 0; j < tabLen; j++) {
+//            ElfW(Sym) sym = symtab[j];
+//            char* str = &strtab[sym.st_name];
+//            size_t demangledSize = 512;
+//            int status;
+//            char demangled[512];
+//            abi::__cxa_demangle(str, demangled, &demangledSize, &status);
+//
+//            bool found = false;
+//            if (status == 0) {
+//                if (strstr(demangled, targetFuncName)) {
+//                    found = true;
+//                    strcpy(finalTargetFuncName, str);
+//                }
+//            } else {
+//                if (strstr(str, targetFuncName)) {
+//                    found = true;
+//                    strcpy(finalTargetFuncName, targetFuncName);
+//                }
+//            }
+//
+//            if (found) {
+//                LOGI("sym %d %08x %s, %s", j, &symtab[j], str,
+//                        status == 0 ? demangled : "(can't demangle)");
+//            }
+//        }
+//        break;
+//    }
+//    return 0;
+//}
 
 void trimStr(char* str) {
     if (str[0] == '\0')
@@ -147,6 +147,7 @@ bool islocal = false;
 
 void reset() {
     LOGI("reset vars");
+    strcpy(finalTargetFuncName, targetFuncName);
     strcpy(filename, "");
     strcpy(targetFilename, "libtarget.so");
     strcpy(sourcePath, "");
@@ -181,6 +182,17 @@ void copyToInternal() {
         }
         fwrite(buff, 1, len, ftarget);
         totalCopied += len;
+
+        //unsigned char printBuff[513];
+        //for (int i = 0; i < len; i++) {
+        //    if (buff[i] >= 0x20 && buff[i] <= 0x7E) {
+        //        printBuff[i] = buff[i];
+        //    } else {
+        //        printBuff[i] = '.';
+        //    }
+        //}
+        //printBuff[len] = '\0';
+        //LOGI("%s", printBuff);
     }
 
     LOGI("copied %d", totalCopied);
@@ -223,7 +235,8 @@ bool getLibFunc(struct android_app* state) {
     dlerror(); /* Clear any existing error */
 
     //dl_iterate_phdr(callback, (void*)filename);
-    dl_iterate_phdr(callback, (void*)targetFilename);
+    //no need demangle because its declared in android_native_app_glue.h as extern "C"
+    //dl_iterate_phdr(callback, (void*)targetFilename);
 
     void (*libMainFunc)(struct android_app*);
 
