@@ -4,43 +4,64 @@ import android.app.Activity;
 import android.app.NativeActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.IOException;
+
 public class MainActivity extends Activity {
 
-    TextView tv;
-    Button btnTriangle;
+    TextView txtFile;
     Button btnLoad;
-    Button btnLoda2;
-    Button btnMa2;
+    Button btnChooseFile;
     public ViewGroup root;
+    FileChooser fileChooser;
+    //Button btnLoda2;
+    //Button btnMa2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //getActionBar().hide();
-
         setContentView(R.layout.activity_main);
 
         root = findViewById(R.id.mainRoot);
-
-        // Example of a call to a native method
-        tv = findViewById(R.id.sample_text);
+        txtFile = findViewById(R.id.txtFile);
 
         final MainActivity that = this;
 
-        btnTriangle = findViewById(R.id.btnTriangle);
-        if (btnTriangle != null) {
-            btnTriangle.setOnClickListener(new View.OnClickListener() {
+        btnChooseFile = findViewById(R.id.btnChooseFile);
+        if (btnChooseFile != null) {
+            btnChooseFile.setOnClickListener(new View.OnClickListener() {
+                //@Override
+                //public void onClick(View v) {
+                //    LodaJni l = new LodaJni("libsampletoload.so");
+                //    String res = l.runLoadLib();
+                //    tv.setText(res);
+                //}
+
                 @Override
                 public void onClick(View v) {
-                    //Intent intent = new Intent(that, LodaActivity.class);
-                    //intent.putExtra("libpath", "libtriangle.so");
-                    //startActivity(intent);
+                    ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT);
+                    layoutParams.leftToLeft = ConstraintLayout.LayoutParams.MATCH_PARENT;
+                    layoutParams.topToTop = ConstraintLayout.LayoutParams.MATCH_PARENT;
+                    layoutParams.leftMargin = (int)Util.fromDpi(that, 10);
+                    layoutParams.topMargin = (int)Util.fromDpi(that, 10);
+
+                    fileChooser = new FileChooser(that, root, layoutParams, root.getZ() + 10, new Util.Consumer<File>() {
+                        @Override
+                        public void accept(File file) {
+                            try {
+                                txtFile.setText(file.getCanonicalPath());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
                 }
             });
         }
@@ -57,35 +78,38 @@ public class MainActivity extends Activity {
 
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(that, LodaActivity.class);
-                    intent.putExtra("libpath", "/sdcard/loda/libtriangle.so");
-                    startActivity(intent);
+                    try {
+                        Intent intent = new Intent(that, LodaActivity.class);
+                        //intent.putExtra("libpath", "/sdcard/loda/libtriangle.so");
+                        intent.putExtra("libpath", fileChooser.getChoosenFile().getCanonicalPath());
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             });
         }
 
-        btnLoda2 = findViewById(R.id.btnLoda2);
-        if (btnLoda2 != null) {
-            btnLoda2.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(that, NativeActivity.class);
-                    startActivity(intent);
-                }
-            });
-        }
-
-        btnMa2 = findViewById(R.id.btnMa2);
-        if (btnMa2 != null) {
-            btnMa2.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(that, MainActivity2.class);
-                    startActivity(intent);
-                }
-            });
-        }
-
-        //FileChooser f = new FileChooser(this, root);
+        //btnLoda2 = findViewById(R.id.btnLoda2);
+        //if (btnLoda2 != null) {
+        //    btnLoda2.setOnClickListener(new View.OnClickListener() {
+        //        @Override
+        //        public void onClick(View v) {
+        //            Intent intent = new Intent(that, NativeActivity.class);
+        //            startActivity(intent);
+        //        }
+        //    });
+        //}
+        //
+        //btnMa2 = findViewById(R.id.btnMa2);
+        //if (btnMa2 != null) {
+        //    btnMa2.setOnClickListener(new View.OnClickListener() {
+        //        @Override
+        //        public void onClick(View v) {
+        //            Intent intent = new Intent(that, MainActivity2.class);
+        //            startActivity(intent);
+        //        }
+        //    });
+        //}
     }
 }
