@@ -1,22 +1,33 @@
 package com.mrap.loda;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.IOException;
 
-public class FileChooser {
+public class FileChooser extends Activity {
     private Activity activity;
     private ViewGroup view;
     private ViewGroup root;
     private ViewGroup dirItemsContainer;
     private File choosenFile = null;
     Util.Consumer<File> onChoose;
+    boolean isModal = false;
+
+    public FileChooser() {
+        super();
+
+        activity = this;
+    }
 
     public FileChooser(Activity activity, ViewGroup root, ViewGroup.LayoutParams layoutParams, float z, Util.Consumer<File> onChoose) {
         //System.out.println("z: " + z);
+        isModal = true;
 
         this.activity = activity;
         this.root = root;
@@ -24,7 +35,7 @@ public class FileChooser {
 
         view = (ViewGroup)this.activity.getLayoutInflater().inflate(R.layout.file_chooser, root, false);
         view.setLayoutParams(layoutParams);
-        view.setZ(z);
+        //view.setZ(z); // require api 21
 
         //int color1 = Util.getThemeColor(activity, android.R.attr.windowBackground);
         //int color2 = Util.getThemeColor(activity, android.R.attr.popupBackground);
@@ -34,8 +45,25 @@ public class FileChooser {
         view.setBackgroundColor(color3);
 
         root.addView(view);
+        root.invalidate();
 
         dirItemsContainer = view.findViewById(R.id.dirItemsContainer);
+
+        String dirPath = Util.getCacheText(activity, "file_chooser-last_dir");
+        if (dirPath.isEmpty()) {
+            dirPath = "/sdcard";
+        }
+
+        cd(dirPath);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.file_chooser);
+
+        dirItemsContainer = findViewById(R.id.dirItemsContainer);
 
         String dirPath = Util.getCacheText(activity, "file_chooser-last_dir");
         if (dirPath.isEmpty()) {
@@ -68,8 +96,20 @@ public class FileChooser {
                 public void onClick(View v) {
                     choosenFile = f;
                     Util.saveCacheText(activity, "file_chooser-last_dir", dir);
-                    onChoose.accept(f);
-                    root.removeView(view);
+                    if (isModal) {
+                        onChoose.accept(f);
+                        root.removeView(view);
+                    } else {
+                        System.out.println("returning");
+                        Intent returnIntent = new Intent();
+                        try {
+                            returnIntent.putExtra("choosenFile", f.getCanonicalPath());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        setResult(RESULT_OK, returnIntent);
+                        finish();
+                    }
                 }
             });
         }
@@ -97,5 +137,14 @@ public class FileChooser {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        System.out.println("returning");
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("choosenFile", "");
+        setResult(RESULT_OK, returnIntent);
+        super.onBackPressed();
     }
 }

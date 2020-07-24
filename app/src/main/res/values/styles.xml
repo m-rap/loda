@@ -1,10 +1,21 @@
 <resources>
 
+    <!--<style name="LodaButton" parent="Widget.PreferenceFrameLayout">
+        <item name="borderTop">0dip</item>
+        <item name="borderLeft">0dip</item>
+        <item name="borderRight">0dip</item>
+        <item name="borderBottom">0dip</item>
+    </style>-->
+
     <!-- Base application theme. -->
     <!--<style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">-->
     <style name="AppTheme" parent="android:Theme.Holo.Light">
+    <!--<style name="AppTheme" parent="android:Theme.DeviceDefault">-->
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
+        <item name="android:textSize">20dp</item>
+        <item name="android:buttonStyle">@android:style/Widget.Holo.Light.Button.Borderless.Small</item>
+        <!--<item name="android:buttonStyle">@style/LodaButton</item>-->
         <!-- Customize your theme here. -->
         <!--<item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>

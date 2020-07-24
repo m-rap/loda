@@ -23,6 +23,8 @@ public class MainActivity extends Activity {
     //Button btnLoda2;
     //Button btnMa2;
 
+    final int LAUNCH_FILE_CHOOSER = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,22 +48,25 @@ public class MainActivity extends Activity {
 
                 @Override
                 public void onClick(View v) {
-                    ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT);
-                    layoutParams.leftToLeft = ConstraintLayout.LayoutParams.MATCH_PARENT;
-                    layoutParams.topToTop = ConstraintLayout.LayoutParams.MATCH_PARENT;
-                    layoutParams.leftMargin = (int)Util.fromDpi(that, 10);
-                    layoutParams.topMargin = (int)Util.fromDpi(that, 10);
+                    //ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT);
+                    //layoutParams.leftToLeft = ConstraintLayout.LayoutParams.MATCH_PARENT;
+                    //layoutParams.topToTop = ConstraintLayout.LayoutParams.MATCH_PARENT;
+                    //layoutParams.leftMargin = (int)Util.fromDpi(that, 10);
+                    //layoutParams.topMargin = (int)Util.fromDpi(that, 10);
+                    //
+                    //fileChooser = new FileChooser(that, root, layoutParams, root.getZ() + 10, new Util.Consumer<File>() {
+                    //    @Override
+                    //    public void accept(File file) {
+                    //        try {
+                    //            txtFile.setText(file.getCanonicalPath());
+                    //        } catch (IOException e) {
+                    //            e.printStackTrace();
+                    //        }
+                    //    }
+                    //});
 
-                    fileChooser = new FileChooser(that, root, layoutParams, root.getZ() + 10, new Util.Consumer<File>() {
-                        @Override
-                        public void accept(File file) {
-                            try {
-                                txtFile.setText(file.getCanonicalPath());
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
+                    Intent i = new Intent(that, FileChooser.class);
+                    startActivityForResult(i, LAUNCH_FILE_CHOOSER);
                 }
             });
         }
@@ -81,7 +86,8 @@ public class MainActivity extends Activity {
                     try {
                         Intent intent = new Intent(that, LodaActivity.class);
                         //intent.putExtra("libpath", "/sdcard/loda/libtriangle.so");
-                        intent.putExtra("libpath", fileChooser.getChoosenFile().getCanonicalPath());
+                        //intent.putExtra("libpath", fileChooser.getChoosenFile().getCanonicalPath());
+                        intent.putExtra("libpath", txtFile.getText());
                         startActivity(intent);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -111,5 +117,15 @@ public class MainActivity extends Activity {
         //        }
         //    });
         //}
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == LAUNCH_FILE_CHOOSER) {
+            String path = data.getStringExtra("choosenFile");
+            txtFile.setText(path);
+        }
     }
 }
