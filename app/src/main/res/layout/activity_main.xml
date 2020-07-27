@@ -5,95 +5,52 @@
     android:id="@+id/mainRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingStart="10dp"
+    android:paddingTop="30dp"
+    android:paddingEnd="10dp"
+    android:paddingBottom="10dp"
     tools:context=".MainActivity">
-
-    <!--<Button
-        android:id="@id/btnTriangle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:text="triangle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />-->
-
-    <TextView
-        android:id="@+id/txtFile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="" />
 
     <Button
         android:id="@+id/btnChooseFile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:text="Choose File"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txtFile" />
-
-    <Button
-        android:id="@id/btnLoad"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:text="Load"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnChooseFile" />
-    <!--app:layout_constraintTop_toBottomOf="@id/btnTriangle"-->
-
-    <!--
-    <Button
-        android:id="@+id/btnTriangle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="triangle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnNatAct" />
-
-    <TextView
-        android:id="@+id/sample_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:text="Hello World!"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/txtFileLabel" />
 
     <Button
         android:id="@+id/btnLoad"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:text="Load"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sample_text" />
+        app:layout_constraintTop_toBottomOf="@+id/btnChooseFile" />
 
-    <Button
-        android:id="@+id/btnLoda2"
+    <TextView
+        android:id="@+id/txtFileLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Loda 2"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:text="File:"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnLoda1" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/btnMa2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="MA2"
-        app:layout_constraintEnd_toEndOf="parent"
+    <TextView
+        android:id="@+id/txtFile"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@android:color/background_light"
+        android:padding="5dp"
+        android:text=""
+        app:layout_constraintBottom_toTopOf="@+id/btnLoad"
+        app:layout_constraintEnd_toStartOf="@+id/btnChooseFile"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnLoda2" />
-    -->
+        app:layout_constraintTop_toBottomOf="@+id/txtFileLabel" />
 
 </android.support.constraint.ConstraintLayout>
