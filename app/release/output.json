@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "com.mrap.loda",
+  "variantName": "release",
+  "elements": [
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "arm64-v8a"
+        }
+      ],
+      "properties": [],
+      "versionCode": 1,
+      "versionName": "1",
+      "enabled": true,
+      "outputFile": "app-arm64-v8a-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "x86"
+        }
+      ],
+      "properties": [],
+      "versionCode": 1,
+      "versionName": "1",
+      "enabled": true,
+      "outputFile": "app-x86-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "x86_64"
+        }
+      ],
+      "properties": [],
+      "versionCode": 1,
+      "versionName": "1",
+      "enabled": true,
+      "outputFile": "app-x86_64-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "armeabi-v7a"
+        }
+      ],
+      "properties": [],
+      "versionCode": 1,
+      "versionName": "1",
+      "enabled": true,
+      "outputFile": "app-armeabi-v7a-release.apk"
+    }
+  ]
+}

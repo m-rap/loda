@@ -2,13 +2,22 @@ package com.mrap.loda;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class FileChooser extends Activity {
     private Activity activity;
@@ -18,6 +27,8 @@ public class FileChooser extends Activity {
     private File choosenFile = null;
     Util.Consumer<File> onChoose;
     boolean isModal = false;
+    Button btnGotoParent;
+    TextView txtCurrDir;
 
     public FileChooser() {
         super();
@@ -48,6 +59,8 @@ public class FileChooser extends Activity {
         root.invalidate();
 
         dirItemsContainer = view.findViewById(R.id.dirItemsContainer);
+        btnGotoParent = view.findViewById(R.id.btnGotoParent);
+        txtCurrDir = view.findViewById(R.id.txtCurrDir);
 
         String dirPath = Util.getCacheText(activity, "file_chooser-last_dir");
         if (dirPath.isEmpty()) {
@@ -64,6 +77,8 @@ public class FileChooser extends Activity {
         setContentView(R.layout.file_chooser);
 
         dirItemsContainer = findViewById(R.id.dirItemsContainer);
+        btnGotoParent = findViewById(R.id.btnGotoParent);
+        txtCurrDir = findViewById(R.id.txtCurrDir);
 
         String dirPath = Util.getCacheText(activity, "file_chooser-last_dir");
         if (dirPath.isEmpty()) {
@@ -78,20 +93,34 @@ public class FileChooser extends Activity {
     }
 
     View createFileBtn(final String dir, final File f) {
-        TextView a = new TextView(this.activity);
-        ViewGroup.LayoutParams aLp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        a.setClickable(true);
-        a.setLayoutParams(aLp);
-        a.setText(f.getName());
+        LinearLayout l = new LinearLayout(activity);
+        l.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        l.setOrientation(LinearLayout.HORIZONTAL);
+        l.setBackgroundResource(R.drawable.touchable);
+        l.setClickable(true);
+        l.setPadding((int)Util.fromDpi(activity, 5), (int)Util.fromDpi(activity, 3), (int)Util.fromDpi(activity, 5), (int)Util.fromDpi(activity, 3));
+
+        TextView textView = new TextView(this.activity);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        lp.setMarginStart((int)Util.fromDpi(activity, 10));
+        textView.setLayoutParams(lp);
+        textView.setText(f.getName());
+        textView.setGravity(Gravity.CENTER_VERTICAL);
+        textView.setBackgroundColor(Color.TRANSPARENT);
+
+        ImageView icon = new ImageView(activity);
+        icon.setMaxHeight(32);
+
         if (f.isDirectory()) {
-            a.setOnClickListener(new View.OnClickListener() {
+            l.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     cd(dir + "/" + f.getName());
                 }
             });
+            icon.setImageResource(R.drawable.dir_48);
         } else {
-            a.setOnClickListener(new View.OnClickListener() {
+            l.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     choosenFile = f;
@@ -112,8 +141,11 @@ public class FileChooser extends Activity {
                     }
                 }
             });
+            icon.setImageResource(R.drawable.file_48);
         }
-        return a;
+        l.addView(icon);
+        l.addView(textView);
+        return l;
     }
 
     void cd(String dirPath) {
@@ -121,15 +153,40 @@ public class FileChooser extends Activity {
             File dir = new File(dirPath);
             dirPath = dir.getCanonicalPath();
 
-            System.out.println("cd to " + dirPath);
+            //System.out.println("cd to " + dirPath);
+            txtCurrDir.setText(dirPath);
+
             File[] files = dir.listFiles();
             dirItemsContainer.removeAllViews();
 
             File checkParent = new File(dirPath + "/..");
             if (checkParent.canRead()) {
-                dirItemsContainer.addView(createFileBtn(dirPath, checkParent));
+                final String dst = dirPath + "/..";
+                btnGotoParent.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        cd(dst);
+                    }
+                });
+            } else {
+                btnGotoParent.setOnClickListener(null);
             }
-            for (final File f : files) {
+
+            List<File> fileList = Arrays.asList(files);
+            Collections.sort(fileList, new Comparator<File>() {
+                @Override
+                public int compare(File o1, File o2) {
+                    if (o1.isDirectory() && !o2.isDirectory()) {
+                        return -1;
+                    }
+                    if (!o1.isDirectory() && o2.isDirectory()) {
+                        return 1;
+                    }
+                    return o1.getName().toUpperCase().compareTo(o2.getName().toUpperCase());
+                }
+            });
+
+            for (final File f : fileList) {
                 dirItemsContainer.addView(createFileBtn(dirPath, f));
             }
         } catch (SecurityException ex) {
@@ -144,7 +201,7 @@ public class FileChooser extends Activity {
         System.out.println("returning");
         Intent returnIntent = new Intent();
         returnIntent.putExtra("choosenFile", "");
-        setResult(RESULT_OK, returnIntent);
+        setResult(RESULT_CANCELED, returnIntent);
         super.onBackPressed();
     }
 }

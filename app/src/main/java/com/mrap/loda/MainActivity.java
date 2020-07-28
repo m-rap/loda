@@ -123,7 +123,7 @@ public class MainActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == LAUNCH_FILE_CHOOSER) {
+        if (requestCode == LAUNCH_FILE_CHOOSER && resultCode == RESULT_OK) {
             String path = data.getStringExtra("choosenFile");
             txtFile.setText(path);
         }
