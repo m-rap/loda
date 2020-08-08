@@ -201,6 +201,8 @@ void copyToInternal() {
     fclose(ftarget);
 }
 
+char errMsg[512];
+
 bool getLibFunc(struct android_app* state) {
     vector<vector<char>> pathEls;
     int n = splitString(sourcePath, "/", pathEls);
@@ -227,7 +229,9 @@ bool getLibFunc(struct android_app* state) {
     //void* handle = dlopen(targetPath, RTLD_LAZY | RTLD_GLOBAL);
     void* handle = dlopen(targetPath, RTLD_LAZY); // RTLD_GLOBAL bikin sigsegv kalo diload kedua kali
     if (!handle) {
-        LOGI("dlopen error %s", dlerror());
+        snprintf(errMsg, 512, "dlopen error %s", dlerror());
+        LOGI("%s", errMsg);
+        snprintf(errMsg, 512, "dlopen error");
         return false;
     }
     LOGI("dlopen success");
@@ -243,7 +247,9 @@ bool getLibFunc(struct android_app* state) {
     libMainFunc = (void (*)(struct android_app*))dlsym(handle, finalTargetFuncName);
     char* error = dlerror();
     if (error != NULL) {
-        LOGI("dlsym error %s", error);
+        snprintf(errMsg, 512, "dlsym error %s", error);
+        LOGI("%s", errMsg);
+        snprintf(errMsg, 512, "dlsym error");
         dlclose(handle);
         return false;
     }
@@ -297,6 +303,10 @@ void android_main(struct android_app* state) {
     bool res = getLibFunc(state);
 
     if (!res) {
+        jmethodID metIdFinish = env->GetMethodID(activityCls, "finishWithError", "(Ljava/lang/String;)V");
+        jstring jmsg = env->NewStringUTF(errMsg);
+        env->CallVoidMethod(activityObj, metIdFinish, jmsg);
+        env->DeleteLocalRef(jmsg);
         waitTermination(state);
     }
 

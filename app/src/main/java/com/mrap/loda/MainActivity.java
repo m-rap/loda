@@ -1,8 +1,12 @@
 package com.mrap.loda;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.NativeActivity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.view.View;
@@ -16,6 +20,7 @@ import java.io.IOException;
 public class MainActivity extends Activity {
 
     TextView txtFile;
+    TextView txtErrMsg;
     Button btnLoad;
     Button btnChooseFile;
     public ViewGroup root;
@@ -24,6 +29,7 @@ public class MainActivity extends Activity {
     //Button btnMa2;
 
     final int LAUNCH_FILE_CHOOSER = 0;
+    final int LAUNCH_LODA= 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +39,7 @@ public class MainActivity extends Activity {
 
         root = findViewById(R.id.mainRoot);
         txtFile = findViewById(R.id.txtFile);
+        txtErrMsg = findViewById(R.id.txtErrMsg);
 
         final MainActivity that = this;
 
@@ -65,8 +72,12 @@ public class MainActivity extends Activity {
                     //    }
                     //});
 
-                    Intent i = new Intent(that, FileChooser.class);
-                    startActivityForResult(i, LAUNCH_FILE_CHOOSER);
+                    if (that.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                        Intent i = new Intent(that, FileChooser.class);
+                        startActivityForResult(i, LAUNCH_FILE_CHOOSER);
+                    } else {
+                        openAppInfo();
+                    }
                 }
             });
         }
@@ -88,7 +99,7 @@ public class MainActivity extends Activity {
                         //intent.putExtra("libpath", "/sdcard/loda/libtriangle.so");
                         //intent.putExtra("libpath", fileChooser.getChoosenFile().getCanonicalPath());
                         intent.putExtra("libpath", txtFile.getText());
-                        startActivity(intent);
+                        startActivityForResult(intent, LAUNCH_LODA);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -119,6 +130,20 @@ public class MainActivity extends Activity {
         //}
     }
 
+    public void openAppInfo() {
+        try {
+            //Open the specific App Info page:
+            Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.setData(Uri.parse("package:com.mrap.loda"));
+            startActivity(intent);
+        } catch ( ActivityNotFoundException e ) {
+            //e.printStackTrace();
+            //Open the generic Apps page:
+            Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
+            startActivity(intent);
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -126,6 +151,15 @@ public class MainActivity extends Activity {
         if (requestCode == LAUNCH_FILE_CHOOSER && resultCode == RESULT_OK) {
             String path = data.getStringExtra("choosenFile");
             txtFile.setText(path);
+        }
+
+        if (requestCode == LAUNCH_LODA) {
+            if (resultCode == RESULT_OK) {
+                String msg = data.getStringExtra("errMsg");
+                txtErrMsg.setText(msg);
+            } else {
+                txtErrMsg.setText("");
+            }
         }
     }
 }
